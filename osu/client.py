@@ -1,11 +1,12 @@
 import asyncio
 from pathlib import Path
-from typing import List, Optional, Tuple, Any
+from typing import List, Optional, Tuple
 
 import aiohttp
-from ossapi import OssapiAsync, Beatmapset, Beatmap
+from ossapi import OssapiAsync, Beatmapset
 
 import config
+from helper.tools import FileTools
 
 
 class OsuClient:
@@ -26,8 +27,13 @@ class OsuClient:
             async with session.get(download_endpoint_url) as response:
                 response_content = await response.read()
 
-        osz_name = f"{beatmapset.id} {beatmapset.artist} - {beatmapset.title}{' [no video]' if no_video else ''}.osz"
+        osz_name = FileTools.clean_path_string(f"{beatmapset.id} {beatmapset.artist} - {beatmapset.title}{' [no video]' if no_video else ''}.osz")
         osz_file = config.BEATMAPSETS_FOLDER.joinpath(osz_name)
+
+        suffix = 1
+        while osz_file.exists():
+            osz_file = config.BEATMAPSETS_FOLDER.joinpath(f"{osz_file.stem} ({suffix}){osz_file.suffix}")  # TODO handle collisions better
+            suffix += 1
 
         with open(osz_file, "wb") as f:
             f.write(response_content)
@@ -35,7 +41,7 @@ class OsuClient:
         return osz_file
 
     @classmethod
-    async def osz_files_from_beatmapset_ids(cls, beatmapset_ids: List[int], no_video: bool = False) -> List[Path]:
+    async def osz_files_from_beatmapset_ids(cls, beatmapset_ids: List[int], no_video: bool = False) -> Tuple[Path]:
         beatmapset_ids = filter(lambda x: x is not None, beatmapset_ids)
         tasks = [cls.osz_file_from_beatmapset_id(beatmapset_id, no_video) for beatmapset_id in beatmapset_ids]
 

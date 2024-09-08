@@ -21,9 +21,9 @@ class Bot(commands.Bot):
         print(f"Logged in as {self.user}")
 
     async def load_cogs(self):
-        cogs_file = Path(__file__).parent.joinpath("cogs")
+        cogs_folder = Path(__file__).parent.joinpath("cogs")
 
-        for cog_file in cogs_file.glob("*.py"):
+        for cog_file in cogs_folder.glob("*.py"):
             cog_name = cog_file.name[:-3]
             await self.load_extension(f"disc.cogs.{cog_name}")
             print(f"Loaded cog: {cog_name}")
