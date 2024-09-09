@@ -24,7 +24,7 @@ class Map:
     def create(cls, map_id, osz_file: Path):
         if isinstance(map_id, BeatmapId):
             print(f"Extracting beatmap from osz: {map_id}")
-            osz_file = BeatmapExtractor(map_id, osz_file).get_beatmap_file()
+            osz_file = BeatmapExtractor(map_id, osz_file).osz_file
 
         return cls(map_id, osz_file)
 

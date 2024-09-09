@@ -22,6 +22,7 @@ and our array of IDs must look like this:
 [69, 420]
 for it to pull beatmapID 69 out of mapset1, and beatmapID 420 out of mapset2.
 """
+import re
 import zipfile
 from pathlib import Path
 
@@ -31,14 +32,16 @@ from osu.map_id import BeatmapId
 class BeatmapExtractor:
     def __init__(self, beatmap_id: BeatmapId, osz_file: Path):
         self.beatmap_id = beatmap_id
-        self.osz_file: Path = osz_file
+        self.osz_file = self.extract(osz_file)
 
-    def get_beatmap_file(self) -> Path:
-        new_osz_file = self.osz_file.with_stem(f"[{self.beatmap_id.beatmap_id}] {self.osz_file.stem}")
+    def extract(self, beatmapset_osz_file: Path) -> Path:
+        beatmap_osz_file = beatmapset_osz_file.with_stem(f"[{self.beatmap_id.beatmap_id}] {beatmapset_osz_file.stem}")
         osu_file_found = False
 
-        with zipfile.ZipFile(self.osz_file, 'r') as zf:
-            with zipfile.ZipFile(new_osz_file, 'w') as zf_out:
+        beatmap_id_pattern = re.compile(r"BeatmapID:\s*([0-9]+)")
+
+        with zipfile.ZipFile(beatmapset_osz_file, 'r') as zf:
+            with zipfile.ZipFile(beatmap_osz_file, 'w') as zf_out:
                 for file in zf.infolist():
                     filename = file.filename
 
@@ -46,13 +49,18 @@ class BeatmapExtractor:
                         osu_file_found = True
                         file_content = zf.read(filename).decode('utf-8', errors='ignore')
 
-                        if str(self.beatmap_id.beatmap_id) in file_content:
+                        found_beatmap_id = int(beatmap_id_pattern.search(file_content).group(1))
+                        if self.beatmap_id.beatmap_id == found_beatmap_id:
+                            print(found_beatmap_id)
                             zf_out.writestr(filename, file_content.encode('utf-8'))
                     else:
                         zf_out.writestr(filename, zf.read(filename))
 
-        if not osu_file_found:
-            new_osz_file.unlink()
-            return self.osz_file
+        # Delete the unused osz file and return the correct one
 
-        return new_osz_file
+        if not osu_file_found:
+            beatmap_osz_file.unlink()
+            return self.osz_file
+        else:
+            beatmapset_osz_file.unlink()
+            return beatmap_osz_file
