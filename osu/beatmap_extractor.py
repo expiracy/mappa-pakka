@@ -39,7 +39,6 @@ def unzip(file_path, destination, beatmap_id): # mostly java translated code
             for zip_info in zip_ref.infolist():
                 file_name = zip_info.filename
                 file_content = zip_ref.read(file_name).decode('utf-8', errors='ignore')
-
                 extension_seen = bool(extension_pattern.search(file_name))
                 id_seen = bool(beatmap_id_pattern.search(file_content))
 
@@ -56,19 +55,39 @@ def unzip(file_path, destination, beatmap_id): # mostly java translated code
         print(e)
 
 
-def process_osz_archive(archive_directory, output_directory, beatmap_id):
-    for filename in os.listdir(archive_directory):
-        if filename.endswith(".osz"): # Sanity checking in case of gitignores or other stuff
-            file_path = os.path.join(archive_directory, filename)
-            output_folder = os.path.join(output_directory, os.path.splitext(filename)[0])
 
-            print(f"Processing {file_path}, extracting to {output_folder}")
-            unzip(file_path, output_folder, beatmap_id)
+def extract_zip(zip_file_path, extract_to):
 
-# code is still unfinished and broken, please dont use xx
+    try:
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            print(f"Extracting {zip_file_path} to {extract_to}")
+            zip_ref.extractall(extract_to)
+    except zipfile.BadZipFile:
+        print("Error: Invalid .zip file.")
+
+
+def process_osz_from_extracted(extracted_directory, output_directory, beatmap_ids):
+
+    osz_files = [f for f in os.listdir(extracted_directory) if f.endswith(".osz")]
+
+    if len(osz_files) != len(beatmap_ids): # Sanity check
+        print("Error: The number of .osz files does not match the number of beatmap IDs.")
+        return
+
+    for index, osz_filename in enumerate(osz_files):
+        osz_file_path = os.path.join(extracted_directory, osz_filename)
+
+        base_name = os.path.splitext(osz_filename)[0]
+        output_folder = os.path.join(output_directory, base_name)
+
+        beatmap_id = beatmap_ids[index]
+        print(f"Processing {osz_file_path}, extracting to {output_folder} with beatmap ID {beatmap_id}")
+
+        unzip(osz_file_path, output_folder, beatmap_id)
+
 
 if __name__ == "__main__":
-    unzip("./Test/326920 Seiryu - BLUE DRAGON.osz",
-          "output/",
-          "898575")
+    test = ["4642489", "3832921"]
+    extract_zip("./Test/test.zip","./extracted")
+    process_osz_from_extracted("./extracted", "./output/", test)
 
