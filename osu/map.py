@@ -5,6 +5,7 @@ from typing import Iterable, List
 
 from config_example import MAP_PACKS_FOLDER
 from helper.tools import FileTools
+from osu.beatmap_extractor import BeatmapExtractor
 from osu.client import OsuClient
 from osu.map_id import BeatmapId
 
@@ -23,8 +24,7 @@ class Map:
     def create(cls, map_id, osz_file: Path):
         if isinstance(map_id, BeatmapId):
             print(f"Extracting beatmap from osz: {map_id}")
-            # TODO process osz file here
-            pass
+            osz_file = BeatmapExtractor(map_id, osz_file).get_beatmap_file()
 
         return cls(map_id, osz_file)
 

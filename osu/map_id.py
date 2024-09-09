@@ -50,7 +50,7 @@ class MapIdFactory:
                 beatmap_id = int(beatmap_id)
 
         except Exception as e:
-            print(f"Could not extract map ID from {url}: {e}")
+            print(f"Could not extract map ID from [{url}]: {e}")
             return None
 
         if beatmap_id is not None:

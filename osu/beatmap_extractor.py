@@ -22,72 +22,37 @@ and our array of IDs must look like this:
 [69, 420]
 for it to pull beatmapID 69 out of mapset1, and beatmapID 420 out of mapset2.
 """
-import os
-import re
 import zipfile
+from pathlib import Path
+
+from osu.map_id import BeatmapId
 
 
-def unzip(file_path, destination, beatmap_id): # mostly java translated code
-    if not os.path.exists(destination):
-        os.makedirs(destination)
+class BeatmapExtractor:
+    def __init__(self, beatmap_id: BeatmapId, osz_file: Path):
+        self.beatmap_id = beatmap_id
+        self.osz_file: Path = osz_file
 
-    extension_pattern = re.compile(r".osu$", re.IGNORECASE)  # Pattern for .osu files
-    beatmap_id_pattern = re.compile(beatmap_id, re.IGNORECASE)
+    def get_beatmap_file(self) -> Path:
+        new_osz_file = self.osz_file.with_stem(f"[{self.beatmap_id.beatmap_id}] {self.osz_file.stem}")
+        osu_file_found = False
 
-    try:
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
-            for zip_info in zip_ref.infolist():
-                file_name = zip_info.filename
-                file_content = zip_ref.read(file_name).decode('utf-8', errors='ignore')
-                extension_seen = bool(extension_pattern.search(file_name))
-                id_seen = bool(beatmap_id_pattern.search(file_content))
+        with zipfile.ZipFile(self.osz_file, 'r') as zf:
+            with zipfile.ZipFile(new_osz_file, 'w') as zf_out:
+                for file in zf.infolist():
+                    filename = file.filename
 
-                if (extension_seen and id_seen) or (not extension_seen and not id_seen):
-                    new_file_path = os.path.join(destination, file_name)
-                    print(f"Unzipping to {new_file_path}")
+                    if filename.endswith(".osu"):
+                        osu_file_found = True
+                        file_content = zf.read(filename).decode('utf-8', errors='ignore')
 
-                    os.makedirs(os.path.dirname(new_file_path), exist_ok=True)
-                    with open(new_file_path, 'w', encoding='utf-8') as new_file:
-                        new_file.write(file_content)
+                        if str(self.beatmap_id.beatmap_id) in file_content:
+                            zf_out.writestr(filename, file_content.encode('utf-8'))
+                    else:
+                        zf_out.writestr(filename, zf.read(filename))
 
-    except Exception as e:
-        print("Uh oh, something went wrong.")
-        print(e)
+        if not osu_file_found:
+            new_osz_file.unlink()
+            return self.osz_file
 
-
-
-def extract_zip(zip_file_path, extract_to):
-
-    try:
-        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-            print(f"Extracting {zip_file_path} to {extract_to}")
-            zip_ref.extractall(extract_to)
-    except zipfile.BadZipFile:
-        print("Error: Invalid .zip file.")
-
-
-def process_osz_from_extracted(extracted_directory, output_directory, beatmap_ids):
-
-    osz_files = [f for f in os.listdir(extracted_directory) if f.endswith(".osz")]
-
-    if len(osz_files) != len(beatmap_ids): # Sanity check
-        print("Error: The number of .osz files does not match the number of beatmap IDs.")
-        return
-
-    for index, osz_filename in enumerate(osz_files):
-        osz_file_path = os.path.join(extracted_directory, osz_filename)
-
-        base_name = os.path.splitext(osz_filename)[0]
-        output_folder = os.path.join(output_directory, base_name)
-
-        beatmap_id = beatmap_ids[index]
-        print(f"Processing {osz_file_path}, extracting to {output_folder} with beatmap ID {beatmap_id}")
-
-        unzip(osz_file_path, output_folder, beatmap_id)
-
-
-if __name__ == "__main__":
-    test = ["4642489", "3832921"]
-    extract_zip("./Test/test.zip","./extracted")
-    process_osz_from_extracted("./extracted", "./output/", test)
-
+        return new_osz_file
