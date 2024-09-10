@@ -17,9 +17,11 @@ class MapPack(commands.Cog):
         map_ids = [MapIdFactory.from_url(url) for url in set(osu_urls)]
         maps = await Maps.from_map_ids(map_ids)
         map_pack = maps.zip()
-
         if map_pack.stat().st_size > 25e6:
-            await ctx.reply(f"Map pack is too large to send: {map_pack.stat().st_size} bytes")
+
+            url = maps.upload("/mappapakka/") # TODO: Give these file uploads a nice name?
+            await ctx.reply(f"Mappack is larger than 25MB, we have uploaded to dropbox for your convenience!\n"
+                      f"Your file resides in this link {url}")
         else:
             await ctx.reply(file=discord.File(map_pack))
 

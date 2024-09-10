@@ -1,11 +1,4 @@
 """
-Hey James xoxo
-I will code the extractor in the following way
-You pass in a zip file to all the .osz archives
-and it will spit out a zip file of directories of osu maps!!
-Love
-Tingyi xxxxxx
-
 Important documentation:
 Due to how things are passed in with the unzip function, we need to ensure
 that the archive being passed in MUST correspond with the list of beatmap
