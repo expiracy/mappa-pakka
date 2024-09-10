@@ -51,7 +51,6 @@ class BeatmapExtractor:
 
                         found_beatmap_id = int(beatmap_id_pattern.search(file_content).group(1))
                         if self.beatmap_id.beatmap_id == found_beatmap_id:
-                            print(found_beatmap_id)
                             zf_out.writestr(filename, file_content.encode('utf-8'))
                     else:
                         zf_out.writestr(filename, zf.read(filename))

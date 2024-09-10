@@ -6,6 +6,7 @@ import aiohttp
 from ossapi import OssapiAsync, Beatmapset
 
 import config
+from helper.log import Logger
 from helper.tools import FileTools
 
 
@@ -17,7 +18,7 @@ class OsuClient:
         try:
             beatmapset: Beatmapset = await cls.ossapi.beatmapset(beatmapset_id)
         except Exception as e:
-            print(f"Failed to fetch beatmap {beatmapset_id}: {e}")
+            Logger.logger.warning(f"Failed to fetch beatmap {beatmapset_id}: {e}")
             return None
 
         no_video_suffix = "n" if no_video else ""

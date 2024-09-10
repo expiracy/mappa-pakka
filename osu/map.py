@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Iterable, List
 
 from config_example import MAP_PACKS_FOLDER
+from helper.log import Logger
 from helper.tools import FileTools
 from osu.beatmap_extractor import BeatmapExtractor
 from osu.client import OsuClient
@@ -23,7 +24,7 @@ class Map:
     @classmethod
     def create(cls, map_id, osz_file: Path):
         if isinstance(map_id, BeatmapId):
-            print(f"Extracting beatmap from osz: {map_id}")
+            Logger.logger.info(f"Extracting beatmap from osz: {map_id}")
             osz_file = BeatmapExtractor(map_id, osz_file).osz_file
 
         return cls(map_id, osz_file)

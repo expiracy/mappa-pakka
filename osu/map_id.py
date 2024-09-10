@@ -1,5 +1,8 @@
+import logging
 import re
 from typing import Optional
+
+from helper.log import Logger
 
 
 class BeatmapsetId:
@@ -50,7 +53,7 @@ class MapIdFactory:
                 beatmap_id = int(beatmap_id)
 
         except Exception as e:
-            print(f"Could not extract map ID from [{url}]: {e}")
+            Logger.logger.warning(f"Could not extract map ID from [{url}]: {e}")
             return None
 
         if beatmap_id is not None:
