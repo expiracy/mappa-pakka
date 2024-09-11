@@ -18,10 +18,10 @@ class MapPack(commands.Cog):
         maps = await Maps.from_map_ids(map_ids)
         map_pack = maps.zip()
         if map_pack.stat().st_size > 25e6:
-
+            await ctx.reply("The file(s) you have provided us with is larger than the upload limit for Discord, "
+                            "please wait as we upload it to dropbox")
             url = maps.upload("/mappapakka/") # TODO: Give these file uploads a nice name?
-            await ctx.reply(f"Mappack is larger than 25MB, we have uploaded to dropbox for your convenience!\n"
-                      f"Your file resides in this link {url}")
+            await ctx.reply(f"Your file resides in this link {url}")
         else:
             await ctx.reply(file=discord.File(map_pack))
 
