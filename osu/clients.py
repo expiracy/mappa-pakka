@@ -3,10 +3,13 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 import aiohttp
+import dropbox
 from ossapi import OssapiAsync, Beatmapset
 
 import config
+from config import DROPBOX_ACCESS_TOKEN
 from helper.tools import FileTools
+
 
 
 class OsuClient:
@@ -49,8 +52,20 @@ class OsuClient:
 
         return osz_files
 
+class DbxClient:
+    client = None
+    dbx_path = "/mappapakka/"
+
+    @classmethod
+    async def init(cls, token: str):
+
+        if DbxClient.client is None: # Throwable errors later on
+            DbxClient.client = dropbox.Dropbox(token)
+            print("Dropbox client initialised")
 
 if __name__ == '__main__':
     # Test code
     beatmap_ids = [2186718, 2193331]
     asyncio.run(OsuClient.osz_files_from_beatmapset_ids(beatmap_ids))
+    # DbxClient.init(DROPBOX_ACCESS_TOKEN)
+
