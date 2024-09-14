@@ -7,7 +7,7 @@ from typing import Iterable, List
 from config import MAP_PACKS_FOLDER, DROPBOX_ACCESS_TOKEN
 from helper.tools import FileTools
 from osu.beatmap_extractor import BeatmapExtractor
-from osu.clients.clients import OsuClient, DbxClient
+from osu.clients import OsuClient, DbxClient
 from osu.map_id import BeatmapId
 
 
