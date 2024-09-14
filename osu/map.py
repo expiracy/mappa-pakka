@@ -1,10 +1,10 @@
 import uuid
-
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Iterable, List
 
 from config import MAP_PACKS_FOLDER, DROPBOX_ACCESS_TOKEN
+from helper.log import Logger
 from helper.tools import FileTools
 from osu.beatmap_extractor import BeatmapExtractor
 from osu.clients import OsuClient, DbxClient
@@ -24,7 +24,7 @@ class Map:
     @classmethod
     def create(cls, map_id, osz_file: Path):
         if isinstance(map_id, BeatmapId):
-            print(f"Extracting beatmap from osz: {map_id}")
+            Logger.logger.info(f"Extracting beatmap from osz: {map_id}")
             osz_file = BeatmapExtractor(map_id, osz_file).osz_file
 
         return cls(map_id, osz_file)
@@ -53,7 +53,7 @@ class Maps:
 
     def zip(self):
         map_pack_file = MAP_PACKS_FOLDER.joinpath(f"{uuid.uuid4()}.zip")
-        print(map_pack_file)
+
         files = self.files()
         FileTools.zip_files(files, to_file=map_pack_file)
 
