@@ -1,15 +1,13 @@
 import uuid
-import zipfile
 
-import dropbox
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Iterable, List, Any
+from typing import Iterable, List
 
 from config import MAP_PACKS_FOLDER, DROPBOX_ACCESS_TOKEN
 from helper.tools import FileTools
 from osu.beatmap_extractor import BeatmapExtractor
-from osu.clients import OsuClient, DbxClient
+from osu.clients.clients import OsuClient, DbxClient
 from osu.map_id import BeatmapId
 
 
@@ -34,7 +32,6 @@ class Map:
 
 class Maps:
     def __init__(self, maps: List[Map]):
-        self.DbxClient = None
         self.maps = maps
 
     @classmethod
@@ -62,24 +59,18 @@ class Maps:
 
         return map_pack_file
 
-    async def upload(self) -> str | None:
+    def upload(self):
 
-        await DbxClient.init(DROPBOX_ACCESS_TOKEN)
-
-        if DbxClient.client is None:
-            raise ValueError("DbxClient is not connected")
+        DbxClient.init(DROPBOX_ACCESS_TOKEN)
 
         zf = self.zip()
         dbx_destination = DbxClient.dbx_path + zf.name
-        try:
-            with open(zf, "rb") as f:
-                DbxClient.client.files_upload(f.read(), dbx_destination)
-                shared_link_metadata = DbxClient.client.sharing_create_shared_link_with_settings(dbx_destination)
-                #  print(f"File uploaded successfully! {shared_link_metadata.url} is url")
-                # Temporary file deletion
-                files = self.files()
-                FileTools.delete_files(files)
-                return shared_link_metadata.url
-        except Exception as e:
-            print(f"Error uploading: {e}")
-            return None # thoughts on throwing an error here instead?
+
+        with open(zf, "rb") as f:
+            DbxClient.client.files_upload(f.read(), dbx_destination)
+            shared_link_metadata = DbxClient.client.sharing_create_shared_link_with_settings(dbx_destination)
+            # Temporary file deletion
+            files = self.files()
+            FileTools.delete_files(files)
+            zf.unlink() # am i right in putting this here? It does work but im not sure if this should be here
+            return shared_link_metadata.url

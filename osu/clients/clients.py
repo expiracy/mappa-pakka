@@ -1,13 +1,14 @@
 import asyncio
 from pathlib import Path
 from typing import List, Optional, Tuple
-
-import aiohttp
 import dropbox
+import aiohttp
+
 from ossapi import OssapiAsync, Beatmapset
 
 import config
-from config import DROPBOX_ACCESS_TOKEN
+from config import DROPBOX_APP_KEY
+
 from helper.tools import FileTools
 
 
@@ -52,16 +53,19 @@ class OsuClient:
 
         return osz_files
 
+
 class DbxClient:
-    client = None
+    client = None # error throwing
     dbx_path = "/mappapakka/"
-
     @classmethod
-    async def init(cls, token: str):
+    def init(cls, token: str):
 
-        if DbxClient.client is None: # Throwable errors later on
-            DbxClient.client = dropbox.Dropbox(token)
-            print("Dropbox client initialised")
+        DbxClient.client = dropbox.Dropbox(app_key=config.DROPBOX_APP_KEY,
+                          app_secret=config.DROPBOX_APP_SECRET,
+                          oauth2_access_token=config.DROPBOX_ACCESS_TOKEN,
+                          oauth2_refresh_token=config.DROPBOX_REFRESH_TOKEN)
+        print("Dropbox client initialised")
+
 
 if __name__ == '__main__':
     # Test code
