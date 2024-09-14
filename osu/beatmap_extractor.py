@@ -1,27 +1,3 @@
-"""
-Hey James xoxo
-I will code the extractor in the following way
-You pass in a zip file to all the .osz archives
-and it will spit out a zip file of directories of osu maps!!
-Love
-Tingyi xxxxxx
-
-Important documentation:
-Due to how things are passed in with the unzip function, we need to ensure
-that the archive being passed in MUST correspond with the list of beatmap
-IDs that is also passed in
-
-i.e
-we need to pull beatmapID 69 out of mapset1, and beatmapID 420 out of mapset2.
-our archive would look like this:
-
-mapset1
-mapset2
-
-and our array of IDs must look like this:
-[69, 420]
-for it to pull beatmapID 69 out of mapset1, and beatmapID 420 out of mapset2.
-"""
 import re
 import zipfile
 from pathlib import Path

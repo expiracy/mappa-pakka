@@ -3,11 +3,11 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Iterable, List
 
-from config_example import MAP_PACKS_FOLDER
+from config import MAP_PACKS_FOLDER, DROPBOX_ACCESS_TOKEN
 from helper.log import Logger
 from helper.tools import FileTools
 from osu.beatmap_extractor import BeatmapExtractor
-from osu.client import OsuClient
+from osu.clients import OsuClient, DbxClient
 from osu.map_id import BeatmapId
 
 
@@ -56,6 +56,19 @@ class Maps:
 
         files = self.files()
         FileTools.zip_files(files, to_file=map_pack_file)
-        FileTools.delete_files(files)
 
         return map_pack_file
+
+    def upload(self):
+
+        zf = self.zip()
+        dbx_destination = DbxClient.dbx_path + zf.name
+
+        with open(zf, "rb") as f:
+            DbxClient.client.files_upload(f.read(), dbx_destination)
+            shared_link_metadata = DbxClient.client.sharing_create_shared_link_with_settings(dbx_destination)
+            # Temporary file deletion
+            files = self.files()
+            FileTools.delete_files(files)
+            zf.unlink()
+            return shared_link_metadata.url
