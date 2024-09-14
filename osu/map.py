@@ -61,8 +61,6 @@ class Maps:
 
     def upload(self):
 
-        DbxClient.init(DROPBOX_ACCESS_TOKEN)
-
         zf = self.zip()
         dbx_destination = DbxClient.dbx_path + zf.name
 
@@ -72,5 +70,5 @@ class Maps:
             # Temporary file deletion
             files = self.files()
             FileTools.delete_files(files)
-            zf.unlink() # am i right in putting this here? It does work but im not sure if this should be here
+            zf.unlink()
             return shared_link_metadata.url

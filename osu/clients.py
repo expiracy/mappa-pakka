@@ -54,16 +54,11 @@ class OsuClient:
 
 
 class DbxClient:
-    client = None # error throwing
     dbx_path = "/mappapakka/"
-    @classmethod
-    def init(cls, token: str):
-
-        DbxClient.client = dropbox.Dropbox(app_key=config.DROPBOX_APP_KEY,
+    client = dropbox.Dropbox(app_key=config.DROPBOX_APP_KEY,
                           app_secret=config.DROPBOX_APP_SECRET,
                           oauth2_access_token=config.DROPBOX_ACCESS_TOKEN,
                           oauth2_refresh_token=config.DROPBOX_REFRESH_TOKEN)
-        Logger.logger.info("Dropbox client initialised")
 
 
 if __name__ == '__main__':
