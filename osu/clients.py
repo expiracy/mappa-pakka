@@ -63,7 +63,7 @@ class DbxClient:
                           app_secret=config.DROPBOX_APP_SECRET,
                           oauth2_access_token=config.DROPBOX_ACCESS_TOKEN,
                           oauth2_refresh_token=config.DROPBOX_REFRESH_TOKEN)
-        print("Dropbox client initialised")
+        Logger.logger.info("Dropbox client initialised")
 
 
 if __name__ == '__main__':
