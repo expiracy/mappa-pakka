@@ -18,7 +18,7 @@ class Bot(commands.Bot):
     async def on_ready(self):
         await self.load_cogs()
         await self.tree.sync()
-        Logger.logger.info(f"Logged in as {self.user}")
+        Logger.mappa_pakka.info(f"Logged in as {self.user}")
 
     async def load_cogs(self):
         cogs_folder = Path(__file__).parent.joinpath("cogs")
@@ -26,9 +26,4 @@ class Bot(commands.Bot):
         for cog_file in cogs_folder.glob("*.py"):
             cog_name = cog_file.name[:-3]
             await self.load_extension(f"disc.cogs.{cog_name}")
-            Logger.logger.info(f"Loaded cog: {cog_name}")
-
-
-if __name__ == '__main__':
-    bot = Bot()
-    bot.run(config.DISCORD_BOT_TOKEN)
+            Logger.mappa_pakka.info(f"Loaded cog: {cog_name}")

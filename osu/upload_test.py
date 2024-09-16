@@ -3,6 +3,7 @@ DBX upload test
 """
 import dropbox
 
+
 def upload_to_dropbox(file_from, file_to):
     dbx = dropbox.Dropbox(app_key="",
                           app_secret="",
@@ -15,6 +16,7 @@ def upload_to_dropbox(file_from, file_to):
     shared_link_metadata = dbx.sharing_create_shared_link_with_settings(file_to)
 
     return shared_link_metadata.url
+
 
 if __name__ == '__main__':
     file_path = './Test/stinky.zip'

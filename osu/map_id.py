@@ -53,7 +53,7 @@ class MapIdFactory:
                 beatmap_id = int(beatmap_id)
 
         except Exception as e:
-            Logger.logger.warning(f"Could not extract map ID from [{url}]: {e}")
+            Logger.mappa_pakka.warning(f"Could not extract map ID from [{url}]: {e}")
             return None
 
         if beatmap_id is not None:
