@@ -64,21 +64,22 @@ class Maps:
 
         return map_pack_file
 
-    def upload(self):
-
-        zf = self.zip()
-        dbx_destination = DbxClient.dbx_path + zf.name
-
-        with open(zf, "rb") as f:
-            DbxClient.client.files_upload(f.read(), dbx_destination)
-            shared_link_metadata = DbxClient.client.sharing_create_shared_link_with_settings(dbx_destination)
-            # Temporary file deletion
-            Logger.logger.info("Cleaning up files")
-            self.cleanup()
-            zf.unlink()
-            return shared_link_metadata.url
+    # def upload(self): Deprecated code for later if needed
+    #
+    #     zf = self.zip()
+    #     dbx_destination = DbxClient.dbx_path + zf.name
+    #
+    #     with open(zf, "rb") as f:
+    #         DbxClient.client.files_upload(f.read(), dbx_destination)
+    #         shared_link_metadata = DbxClient.client.sharing_create_shared_link_with_settings(dbx_destination)
+    #         # Temporary file deletion
+    #
+    #         self.cleanup()
+    #         zf.unlink()
+    #         return shared_link_metadata.url
 
     def cleanup(self):
+        Logger.logger.info("Cleaning up files")
         for item in self.maps:
             if item.temporary and item.osz_file.exists():
                 item.osz_file.unlink()

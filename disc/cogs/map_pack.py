@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from helper.log import Logger
+from osu.clients import DbxClient
 from osu.map import Maps
 from osu.map_id import MapIdFactory
 
@@ -23,7 +24,8 @@ class MapPack(commands.Cog):
                             "please wait as we upload it to dropbox")
 
             try:
-                url = maps.upload()
+                url = DbxClient.upload_file(map_pack)
+                maps.cleanup()
                 await ctx.reply(f"Your file resides in this link {url}")
 
             except Exception as e:
