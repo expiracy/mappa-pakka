@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from helper.log import Logger
 from osu.map import Maps
 from osu.map_id import MapIdFactory
 
@@ -28,8 +29,10 @@ class MapPack(commands.Cog):
             except Exception as e:
                 await ctx.reply(f"Something went wrong: {e}")
         else:
+            Logger.logger.info("Uploading to discord...") # mainly for timing checks
+            maps.cleanup() # cleanup maps!
             await ctx.reply(file=discord.File(map_pack))
-
+        Logger.logger.info(f"Deleting {map_pack.name}")
         map_pack.unlink()
 
 

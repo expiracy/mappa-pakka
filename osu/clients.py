@@ -17,6 +17,7 @@ class OsuClient:
 
     @classmethod
     async def osz_file_from_beatmapset_id(cls, beatmapset_id: int, no_video: bool = False) -> Optional[Path]:
+
         try:
             beatmapset: Beatmapset = await cls.ossapi.beatmapset(beatmapset_id)
         except Exception as e:
@@ -24,14 +25,19 @@ class OsuClient:
             return None
 
         no_video_suffix = "n" if no_video else ""
+        osz_name = FileTools.clean_path_string(f"{beatmapset.id} {beatmapset.artist} - {beatmapset.title}{' [no video]' if no_video else ''}.osz")
+        osz_file = config.BEATMAPSETS_FOLDER.joinpath(osz_name)
+
+        if osz_file.exists():
+            Logger.logger.info(f"File already exists: {osz_file}")
+            return osz_file
+
+
         download_endpoint_url = f"https://catboy.best/d/{beatmapset.id}{no_video_suffix}"
 
         async with aiohttp.ClientSession() as session:
             async with session.get(download_endpoint_url) as response:
                 response_content = await response.read()
-
-        osz_name = FileTools.clean_path_string(f"{beatmapset.id} {beatmapset.artist} - {beatmapset.title}{' [no video]' if no_video else ''}.osz")
-        osz_file = config.BEATMAPSETS_FOLDER.joinpath(osz_name)
 
         suffix = 1
         while osz_file.exists():

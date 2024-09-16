@@ -17,17 +17,20 @@ class Map:
     The osz file is the beatmapset or beatmap file (processed file)
     """
 
-    def __init__(self, map_id, osz_file: Path):
+    def __init__(self, map_id, osz_file: Path, temporary: bool = False):
         self.map_id = map_id
         self.osz_file = osz_file
+        self.temporary = temporary
 
     @classmethod
     def create(cls, map_id, osz_file: Path):
         if isinstance(map_id, BeatmapId):
             Logger.logger.info(f"Extracting beatmap from osz: {map_id}")
-            osz_file = BeatmapExtractor(map_id, osz_file).osz_file
+            with BeatmapExtractor(map_id, osz_file).extract(osz_file) as beatmap:
+                Logger.logger.info(f"File {beatmap} marked as temporary")
+                return cls(map_id, beatmap, temporary=True)
 
-        return cls(map_id, osz_file)
+        return cls(map_id, osz_file, temporary=False)
 
 
 class Maps:
@@ -37,6 +40,7 @@ class Maps:
     @classmethod
     async def from_map_ids(cls, map_ids: Iterable) -> "Maps":
         valid_map_ids = list(filter(lambda map_id: map_id is not None, map_ids))
+        Logger.logger.info("Downloading maps")
         osz_files = await OsuClient.osz_files_from_beatmapset_ids([map_id.beatmapset_id for map_id in valid_map_ids])
         return cls.create_parallel(valid_map_ids, osz_files)
 
@@ -55,6 +59,7 @@ class Maps:
         map_pack_file = MAP_PACKS_FOLDER.joinpath(f"{uuid.uuid4()}.zip")
 
         files = self.files()
+        Logger.logger.info(files)
         FileTools.zip_files(files, to_file=map_pack_file)
 
         return map_pack_file
@@ -68,7 +73,12 @@ class Maps:
             DbxClient.client.files_upload(f.read(), dbx_destination)
             shared_link_metadata = DbxClient.client.sharing_create_shared_link_with_settings(dbx_destination)
             # Temporary file deletion
-            files = self.files()
-            FileTools.delete_files(files)
+            Logger.logger.info("Cleaning up files")
+            self.cleanup()
             zf.unlink()
             return shared_link_metadata.url
+
+    def cleanup(self):
+        for item in self.maps:
+            if item.temporary and item.osz_file.exists():
+                item.osz_file.unlink()

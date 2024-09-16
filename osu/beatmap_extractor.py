@@ -31,11 +31,5 @@ class BeatmapExtractor:
                     else:
                         zf_out.writestr(filename, zf.read(filename))
 
-        # Delete the unused osz file and return the correct one
-
-        if not osu_file_found:
-            beatmap_osz_file.unlink()
-            return self.osz_file
-        else:
-            beatmapset_osz_file.unlink()
-            return beatmap_osz_file
+        file_to_return = beatmap_osz_file if osu_file_found else self.osz_file
+        return file_to_return
