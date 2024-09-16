@@ -8,6 +8,7 @@ if __name__ == '__main__':
     config.DATA_FOLDER.mkdir(parents=True, exist_ok=True)
     config.BEATMAPSETS_FOLDER.mkdir(parents=True, exist_ok=True)
     config.MAP_PACKS_FOLDER.mkdir(parents=True, exist_ok=True)
+    config.LOG_FOLDER.mkdir(parents=True, exist_ok=True)
 
     # Periodic events
     day_1 = 60 * 60 * 24
