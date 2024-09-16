@@ -65,7 +65,14 @@ class DbxClient:
                           app_secret=config.DROPBOX_APP_SECRET,
                           oauth2_access_token=config.DROPBOX_ACCESS_TOKEN,
                           oauth2_refresh_token=config.DROPBOX_REFRESH_TOKEN)
+    @classmethod
+    def upload_file(cls, path: Path) -> Optional[str]:
+        with open(path, "rb") as f:
+            r = DbxClient.client.files_upload(f.read(), f"{cls.dbx_path}/{path.name}")
+            Logger.logger.info(f"Uploaded {path.name} to Dropbox: {r}")
+            shared_link_metadata = DbxClient.client.sharing_create_shared_link_with_settings(cls.dbx_path)
 
+        return shared_link_metadata.url
 
 if __name__ == '__main__':
     # Test code
