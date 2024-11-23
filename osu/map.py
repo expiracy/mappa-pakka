@@ -32,6 +32,9 @@ class Map:
 
         return cls(map_id, osz_file, temporary=False)
 
+    def __str__(self):
+        return f"{str(self.map_id)}"
+
 
 class Maps:
     def __init__(self, maps: List[Map]):
@@ -69,3 +72,12 @@ class Maps:
         for item in self.maps:
             if item.temporary and item.osz_file.exists():
                 item.osz_file.unlink()
+
+    def __str__(self):
+        output = ""
+
+        for i, m in enumerate(self.maps):
+            output += f"{i + 1}. {str(m)}\n"
+
+        return output
+

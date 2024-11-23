@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from dbx.dbx_client import DbxClient
+from disc.embeds.map_pack_embed import MapPackEmbed
 from helper.log import Logger
 from osu.map import Maps
 from osu.map_id import MapIdFactory
@@ -21,19 +22,18 @@ class MapPack(commands.Cog):
         map_pack = maps.zip()
         if map_pack.stat().st_size > 25e6:
             await ctx.reply("The file(s) you have provided us with is larger than the upload limit for Discord, "
-                            "please wait as we upload it to dbx")
-
+                            "please wait as we upload it to cloud storage uwu nyaaaa~")
             try:
                 url = DbxClient.upload_file(map_pack)
                 maps.cleanup()
-                await ctx.reply(f"Your file resides in this link {url}")
+                await ctx.reply(embed=MapPackEmbed(maps, url).embed())
 
             except Exception as e:
-                await ctx.reply(f"Something went wrong: {e}")
+                await ctx.reply(f"Something went wrong (oopsie doopsie): {e}")
         else:
             Logger.mappa_pakka.info("Uploading to discord...")  # mainly for timing checks
             maps.cleanup()  # cleanup maps!
-            await ctx.reply(file=discord.File(map_pack))
+            await ctx.reply(file=discord.File(map_pack), embed=MapPackEmbed(maps).embed())
 
         Logger.mappa_pakka.info(f"Deleting {map_pack.name}")
         map_pack.unlink()

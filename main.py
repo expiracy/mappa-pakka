@@ -11,11 +11,11 @@ if __name__ == '__main__':
     config.LOG_FOLDER.mkdir(parents=True, exist_ok=True)
 
     # Periodic events
-    day_1 = 60 * 60 * 24
-    periodic_cloud_clean = PeriodicTask(day_1, DbxClient.delete_files_in_folder, (DbxClient.dbx_path,))
+    day = 60 * 60 * 24
+    periodic_cloud_clean = PeriodicTask(day * 30, DbxClient.delete_files_in_folder, (DbxClient.dbx_path,))
     periodic_cloud_clean.start()
 
-    periodic_beatmapset_clean = PeriodicTask(day_1 * 3, OsuTools.clean_beatmapset_folder)
+    periodic_beatmapset_clean = PeriodicTask(day * 30, OsuTools.clean_beatmapset_folder)
     periodic_beatmapset_clean.start()
 
     # Run the bot

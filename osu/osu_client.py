@@ -52,6 +52,10 @@ class OsuClient:
 
         return osz_files
 
+    @classmethod
+    def get_beatmap_sync(cls, beatmap_id: int):
+        return asyncio.run(cls.ossapi.beatmap(beatmap_id))
+
 
 if __name__ == '__main__':
     # Test code
